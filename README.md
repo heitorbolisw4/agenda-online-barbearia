@@ -73,4 +73,4 @@ O repositório é **público**. Nunca coloque senha, connection string ou token 
 
 ## Especificação
 
-A especificação completa (v1.0) não fica no repositório. Peça o link ao Lead da equipe.
+A especificação completa (v1.0) não fica no repositório. Ela está na [pasta do Drive da disciplina](https://drive.google.com/drive/folders/1KlODrLl-931_7F_iNLPK9Ba-78MNFEm8) (acesso da turma).
