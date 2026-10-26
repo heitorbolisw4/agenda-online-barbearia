@@ -29,5 +29,11 @@ public record Intervalo
         }
     }
 
+    public bool SeSobrepoe(Intervalo outro)
+       => outro.Fim > Inicio && Fim > outro.Inicio;
+        
+        
+    
+
 
 }
