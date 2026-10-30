@@ -89,4 +89,31 @@ public class CalculadoraDisponibilidadeTests
         Assert.Equal(esperado, resultado);
         
     }
+
+
+    [Fact]
+    public void HorariosLivres_ComLimite_NaoOfereceHorarioAntesDoLimite()
+    {
+        var duracao = TimeSpan.FromMinutes(30);
+        var grade = TimeSpan.FromMinutes(10);
+        var limite = Hora(9, 35);
+        List<Intervalo> ocupados = [];
+        List<Intervalo> janelas = [
+            Intervalo.Create(Hora(9, 0), Hora(11, 0)),
+            
+        ];
+        List<Intervalo> esperado = [
+            //Intervalo.Create(Hora(9, 0), Hora(9, 30)),
+            Intervalo.Create(Hora(9, 40), Hora(10, 10)),
+            Intervalo.Create(Hora(9, 50), Hora(10, 20)),
+            Intervalo.Create(Hora(10, 0), Hora(10, 30)),
+            Intervalo.Create(Hora(10, 10), Hora(10, 40)),
+            Intervalo.Create(Hora(10, 20), Hora(10, 50)),
+            Intervalo.Create(Hora(10, 30), Hora(11, 0)),
+        ];        
+        var resultado = CalculadoraDisponibilidade.HorariosLivres(janelas,  ocupados, duracao, grade, limite);
+        Assert.Equal(esperado, resultado);
+
+        // Then
+    }
 }
