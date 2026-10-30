@@ -15,8 +15,14 @@ public static class CalculadoraDisponibilidade
             while(s + duracao <= janela.Fim)
             {
                 var horario = Intervalo.Create(s, s + duracao);
-                livres.Add(Intervalo.Create(s, s + duracao ));
+                var estaOcupado = ocupados.Any( o => o.SeSobrepoe( horario ) );
+                if( !estaOcupado )
+                {
+                    livres.Add(horario);
+                    
+                }
                 s += grade;
+            
             }
         }
         return livres;

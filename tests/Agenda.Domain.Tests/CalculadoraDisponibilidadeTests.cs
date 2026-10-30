@@ -13,7 +13,7 @@ public class CalculadoraDisponibilidadeTests
         // eu defino os horarios com inicio e fim
         var duracao = TimeSpan.FromMinutes(30);
         var grade = TimeSpan.FromMinutes(10);
-        var limite = Hora(10, 0);
+        var limite = DateTimeOffset.MinValue;
         List<Intervalo> ocupados = [];
         List<Intervalo> janelas = [
             Intervalo.Create(Hora(9, 0), Hora(10, 0))
@@ -26,9 +26,9 @@ public class CalculadoraDisponibilidadeTests
             Intervalo.Create(Hora(9, 30), Hora(10, 0)),
         ];
 
-        var horarioA = CalculadoraDisponibilidade.HorariosLivres(janelas,   ocupados, duracao, grade, limite);
+        var resultado = CalculadoraDisponibilidade.HorariosLivres(janelas,   ocupados, duracao, grade, limite);
         
-        Assert.Equal(esperado, horarioA);
+        Assert.Equal(esperado, resultado);
 
     }
 
@@ -37,7 +37,7 @@ public class CalculadoraDisponibilidadeTests
     {
         var duracao = TimeSpan.FromMinutes(30);
         var grade = TimeSpan.FromMinutes(10);
-        var limite = Hora(10, 0);
+        var limite = DateTimeOffset.MinValue;
         List<Intervalo> ocupados = [];
         List<Intervalo> janelas = [
             Intervalo.Create(Hora(9, 0), Hora(10, 0)),
@@ -54,8 +54,39 @@ public class CalculadoraDisponibilidadeTests
             Intervalo.Create(Hora(14, 20), Hora(14, 50)),
             Intervalo.Create(Hora(14, 30), Hora(15, 0)),
         ];
-        var horarioB = CalculadoraDisponibilidade.HorariosLivres(janelas,   ocupados, duracao, grade, limite);
-        Assert.Equal(esperado, horarioB);
+        var resultado = CalculadoraDisponibilidade.HorariosLivres(janelas,   ocupados, duracao, grade, limite);
+        Assert.Equal(esperado, resultado);
+        
+    }
+
+    [Fact]
+    public void HorariosLivres_ComOcupado_NaoOfereceHorarioQueSobrepoe()
+    {
+        var duracao = TimeSpan.FromMinutes(30);
+        var grade = TimeSpan.FromMinutes(10);
+        var limite = DateTimeOffset.MinValue;
+        List<Intervalo> ocupados = [
+            Intervalo.Create(Hora(10, 0), Hora(10, 30))
+        ];
+        List<Intervalo> janelas = [
+            Intervalo.Create(Hora(9, 0), Hora(12, 0)),
+            
+        ];
+        List<Intervalo> esperado = [
+            Intervalo.Create(Hora(9, 0), Hora(9, 30)),
+            Intervalo.Create(Hora(9, 10), Hora(9, 40)),
+            Intervalo.Create(Hora(9, 20), Hora(9, 50)),
+            Intervalo.Create(Hora(9, 30), Hora(10, 0)),
+            Intervalo.Create(Hora(10, 30), Hora(11, 0)),
+            Intervalo.Create(Hora(10, 40), Hora(11, 10)),
+            Intervalo.Create(Hora(10, 50), Hora(11, 20)),
+            Intervalo.Create(Hora(11, 0), Hora(11, 30)),
+            Intervalo.Create(Hora(11, 10), Hora(11, 40)),
+            Intervalo.Create(Hora(11, 20), Hora(11, 50)),
+            Intervalo.Create(Hora(11, 30), Hora(12, 0)),
+        ];
+        var resultado = CalculadoraDisponibilidade.HorariosLivres(janelas,  ocupados, duracao, grade, limite);
+        Assert.Equal(esperado, resultado);
         
     }
 }
