@@ -1,3 +1,5 @@
+using Agenda.Domain.Exceptions;
+
 namespace Agenda.Domain.Tests;
 
 public class CalculadoraDisponibilidadeTests
@@ -103,7 +105,6 @@ public class CalculadoraDisponibilidadeTests
             
         ];
         List<Intervalo> esperado = [
-            //Intervalo.Create(Hora(9, 0), Hora(9, 30)),
             Intervalo.Create(Hora(9, 40), Hora(10, 10)),
             Intervalo.Create(Hora(9, 50), Hora(10, 20)),
             Intervalo.Create(Hora(10, 0), Hora(10, 30)),
@@ -114,6 +115,19 @@ public class CalculadoraDisponibilidadeTests
         var resultado = CalculadoraDisponibilidade.HorariosLivres(janelas,  ocupados, duracao, grade, limite);
         Assert.Equal(esperado, resultado);
 
-        // Then
+    }
+
+    [Fact]
+    public void HorariosLivres_GradeZero_LancaExcecao()
+    {
+        var duracao = TimeSpan.FromMinutes(30);
+        var grade = TimeSpan.Zero;
+        var limite = DateTimeOffset.MinValue;
+        List<Intervalo> ocupados = [];
+        List<Intervalo> janelas = [
+            Intervalo.Create(Hora(9, 0), Hora(11, 0)),
+            
+        ];
+        Assert.Throws<DomainException>(() => CalculadoraDisponibilidade.HorariosLivres(janelas,  ocupados, duracao, grade, limite));
     }
 }
