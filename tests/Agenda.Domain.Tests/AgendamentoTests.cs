@@ -78,4 +78,27 @@ public class AgendamentoTests
         Assert.Throws<DomainException>(() => Agendamento.Criar(Guid.NewGuid(), Guid.Empty, "Corte", 30, "Jose", "99999999", Hora(9, 30)));
     }
 
+
+    [Fact]
+    public void Cancelar_Confirmado_FicaCancelado()
+    {
+        var status = StatusAgendamento.Cancelado;
+
+        var agendamento = Agendamento.Criar(Guid.NewGuid(), Guid.NewGuid(), "Corte", 30, "Jose", "99999999", Hora(9, 30));
+
+        agendamento.Cancelar();
+
+        Assert.Equal(status, agendamento.Status);
+    
+    }
+
+    [Fact]
+    public void Cancelar_JaCancelado_LancaExcecao()
+    {
+        var agendamento = Agendamento.Criar(Guid.NewGuid(), Guid.NewGuid(), "Corte", 30, "Jose", "99999999", Hora(9, 30));
+    
+        agendamento.Cancelar();
+
+        Assert.Throws<DomainException>(() => agendamento.Cancelar());
+    }
 }

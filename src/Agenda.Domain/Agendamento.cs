@@ -47,6 +47,15 @@ public class Agendamento
         return new Agendamento(profissionalId, servicoId, servicoNome ,duracaoMin, clienteNome, clienteTelefone, inicio, fim);
     }
 
+    public void Cancelar()
+    {
+        if( Status != StatusAgendamento.Confirmado)
+        {
+            throw new DomainException("O Agendamento nao pode ser CANCELADO!");
+        }
+        Status = StatusAgendamento.Cancelado;
+    }
+
     private static void ValidProfissionalId(Guid profissionalId)
     {
         if( profissionalId == Guid.Empty )
