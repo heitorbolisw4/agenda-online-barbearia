@@ -5,7 +5,7 @@ namespace Agenda.Domain;
 
 public class Agendamento
 {
-    private Agendamento(Guid profissionalId, Guid servicoId, string servicoNome, int duracaoMin, string clienteNome, string clienteTelefone, DateTimeOffset inicio, DateTimeOffset fim)
+    private Agendamento(Guid profissionalId, Guid servicoId, string servicoNome, int duracaoMin, string clienteNome, string clienteTelefone, DateTimeOffset inicio, DateTimeOffset fim, Origem origem)
     {
 
         ProfissionalId = profissionalId;
@@ -16,9 +16,10 @@ public class Agendamento
         ClienteTelefone = clienteTelefone;
         Inicio = inicio;
         Fim = fim;
+        Origem = origem;
     }
 
-    public Guid Id { get; private set; } = Guid.NewGuid();
+    public Guid Id { get; private set; } = Guid.CreateVersion7();
     public string Codigo { get; private  set; } = string.Empty;
     public  Guid ProfissionalId { get; private set; }
     public Guid ServicoId { get; private set; }
@@ -37,14 +38,14 @@ public class Agendamento
 
     
 
-    public static Agendamento Criar(Guid profissionalId, Guid servicoId, string servicoNome, int duracaoMin, string clienteNome, string clienteTelefone, DateTimeOffset inicio)
+    public static Agendamento Criar(Guid profissionalId, Guid servicoId, string servicoNome, int duracaoMin, string clienteNome, string clienteTelefone, DateTimeOffset inicio, Origem origem )
     {
         ValidProfissionalId(profissionalId);
         ValidServico(servicoId, servicoNome);
         ValidDuracao(duracaoMin);
         ValidCliente(clienteNome, clienteTelefone);
         var fim = inicio.AddMinutes(duracaoMin);
-        return new Agendamento(profissionalId, servicoId, servicoNome ,duracaoMin, clienteNome, clienteTelefone, inicio, fim);
+        return new Agendamento(profissionalId, servicoId, servicoNome ,duracaoMin, clienteNome, clienteTelefone, inicio, fim, origem);
     }
 
     public void Cancelar()

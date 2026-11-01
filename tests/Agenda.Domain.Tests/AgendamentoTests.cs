@@ -21,7 +21,7 @@ public class AgendamentoTests
         var fim = Hora(9, 30);
         
         
-        var agendamento = Agendamento.Criar(Guid.NewGuid(), Guid.NewGuid(), "Corte", duracaoMin, "Jose", "99999999", inicio);
+        var agendamento = Agendamento.Criar(Guid.NewGuid(), Guid.NewGuid(), "Corte", duracaoMin, "Jose", "99999999", inicio,  Origem.Web);
         
         var status = agendamento.Status;
 
@@ -37,7 +37,7 @@ public class AgendamentoTests
     [InlineData(null)]
     public void Criar_NomeClienteVazio_LancaExcecao(string? nome)
     {
-        Assert.Throws<DomainException>(() => Agendamento.Criar(Guid.NewGuid(), Guid.NewGuid(), "Corte", 30, nome!, "99999999", Hora(9, 30)));
+        Assert.Throws<DomainException>(() => Agendamento.Criar(Guid.NewGuid(), Guid.NewGuid(), "Corte", 30, nome!, "99999999", Hora(9, 30), Origem.Web));
     }
 
     [Theory]
@@ -46,7 +46,7 @@ public class AgendamentoTests
     [InlineData(null)]
     public void Criar_NomeServicoVazio_LancaExcecao(string? servico)
     {
-        Assert.Throws<DomainException>(() => Agendamento.Criar(Guid.NewGuid(), Guid.NewGuid(), servico!, 30, "Jose", "99999999", Hora(9, 30)));
+        Assert.Throws<DomainException>(() => Agendamento.Criar(Guid.NewGuid(), Guid.NewGuid(), servico!, 30, "Jose", "99999999", Hora(9, 30),  Origem.Web));
     }
 
     [Theory]
@@ -55,7 +55,7 @@ public class AgendamentoTests
     [InlineData(null)]
     public void Criar_TelefoneClienteVazio_LancaExcecao(string? telefone)
     {
-        Assert.Throws<DomainException>(() => Agendamento.Criar(Guid.NewGuid(), Guid.NewGuid(), "Corte", 30, "Jose", telefone!, Hora(9, 30)));
+        Assert.Throws<DomainException>(() => Agendamento.Criar(Guid.NewGuid(), Guid.NewGuid(), "Corte", 30, "Jose", telefone!, Hora(9, 30),  Origem.Web));
     }
 
 
@@ -64,18 +64,18 @@ public class AgendamentoTests
     [InlineData(-30)]
     public void Criar_DuracaoVaziaOuNegativa_LancaExcecao(int duracao)
     {
-        Assert.Throws<DomainException>(() => Agendamento.Criar(Guid.NewGuid(), Guid.NewGuid(), "Corte", duracao, "Jose", "99999999", Hora(9, 30)));
+        Assert.Throws<DomainException>(() => Agendamento.Criar(Guid.NewGuid(), Guid.NewGuid(), "Corte", duracao, "Jose", "99999999", Hora(9, 30),  Origem.Web));
     }
 
     [Fact]
     public void Criar_ProfissionalIdVazio_LancaExcecao()
     {
-        Assert.Throws<DomainException>(() => Agendamento.Criar(Guid.Empty, Guid.NewGuid(), "Corte", 30, "Jose", "99999999", Hora(9, 30)));
+        Assert.Throws<DomainException>(() => Agendamento.Criar(Guid.Empty, Guid.NewGuid(), "Corte", 30, "Jose", "99999999", Hora(9, 30),  Origem.Web));
     }
     [Fact]
     public void Criar_ServicoIdVazio_LancaExcecao()
     {
-        Assert.Throws<DomainException>(() => Agendamento.Criar(Guid.NewGuid(), Guid.Empty, "Corte", 30, "Jose", "99999999", Hora(9, 30)));
+        Assert.Throws<DomainException>(() => Agendamento.Criar(Guid.NewGuid(), Guid.Empty, "Corte", 30, "Jose", "99999999", Hora(9, 30),  Origem.Web));
     }
 
 
@@ -84,7 +84,7 @@ public class AgendamentoTests
     {
         var status = StatusAgendamento.Cancelado;
 
-        var agendamento = Agendamento.Criar(Guid.NewGuid(), Guid.NewGuid(), "Corte", 30, "Jose", "99999999", Hora(9, 30));
+        var agendamento = Agendamento.Criar(Guid.NewGuid(), Guid.NewGuid(), "Corte", 30, "Jose", "99999999", Hora(9, 30),  Origem.Web);
 
         agendamento.Cancelar();
 
@@ -95,10 +95,22 @@ public class AgendamentoTests
     [Fact]
     public void Cancelar_JaCancelado_LancaExcecao()
     {
-        var agendamento = Agendamento.Criar(Guid.NewGuid(), Guid.NewGuid(), "Corte", 30, "Jose", "99999999", Hora(9, 30));
+        var agendamento = Agendamento.Criar(Guid.NewGuid(), Guid.NewGuid(), "Corte", 30, "Jose", "99999999", Hora(9, 30),  Origem.Web);
     
         agendamento.Cancelar();
 
         Assert.Throws<DomainException>(() => agendamento.Cancelar());
+    }
+
+    [Theory]
+    [InlineData(Origem.Web)]
+    [InlineData(Origem.Interno)]
+    public void Criar_ComOrigem_GuardaOrigem(Origem origem)
+    {
+
+        var agendamento = Agendamento.Criar(Guid.NewGuid(), Guid.NewGuid(), "Corte", 30, "Jose", "99999999", Hora(9, 30),  origem);
+
+        Assert.Equal(origem, agendamento.Origem);
+        
     }
 }
