@@ -1,8 +1,16 @@
+using Agenda.Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+var conn = builder.Configuration.GetConnectionString("Agenda");
+builder.Services.AddDbContext<AgendaDbContext>( options => options.UseNpgsql( conn ) );
+
+
 
 var app = builder.Build();
 
