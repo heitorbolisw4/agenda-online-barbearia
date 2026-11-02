@@ -82,6 +82,29 @@ namespace Agenda.Infrastructure.Persistence.Migrations
                     b.ToTable("Agendamentos");
                 });
 
+            modelBuilder.Entity("Agenda.Domain.PeriodoExpediente", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("DiaSemana")
+                        .HasColumnType("integer");
+
+                    b.Property<TimeOnly>("Fim")
+                        .HasColumnType("time without time zone");
+
+                    b.Property<TimeOnly>("Inicio")
+                        .HasColumnType("time without time zone");
+
+                    b.Property<Guid>("ProfissionalId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Expedientes");
+                });
+
             modelBuilder.Entity("Agenda.Domain.Servico", b =>
                 {
                     b.Property<Guid>("Id")
