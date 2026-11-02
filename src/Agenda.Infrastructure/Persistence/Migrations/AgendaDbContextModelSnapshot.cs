@@ -81,6 +81,28 @@ namespace Agenda.Infrastructure.Persistence.Migrations
 
                     b.ToTable("Agendamentos");
                 });
+
+            modelBuilder.Entity("Agenda.Domain.Servico", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("Ativo")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("DuracaoMin")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Nome")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("character varying(60)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Servicos");
+                });
 #pragma warning restore 612, 618
         }
     }

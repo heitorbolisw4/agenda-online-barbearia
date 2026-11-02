@@ -8,6 +8,7 @@ namespace Agenda.Infrastructure.Persistence;
 public class AgendaDbContext( DbContextOptions<AgendaDbContext> options ) : DbContext( options )
 {
     public DbSet<Agendamento> Agendamentos => Set<Agendamento>();
+    public DbSet<Servico> Servicos => Set<Servico>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
