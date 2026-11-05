@@ -1,3 +1,4 @@
+using Agenda.Application.Interface;
 using Agenda.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +10,7 @@ builder.Services.AddOpenApi();
 
 var conn = builder.Configuration.GetConnectionString("Agenda");
 builder.Services.AddDbContext<AgendaDbContext>( options => options.UseNpgsql( conn ) );
+builder.Services.AddScoped<IDisponibilidadeLeitura, DisponibilidadeLeitura>();
 
 
 
