@@ -256,11 +256,56 @@ npm run lint    # se o projeto tiver lint configurado
 
 ## Como contribuir
 
-1. Atualize a `main`: `git switch main` e `git pull`.
-2. Crie uma branch: `git switch -c feat/nome-da-tarefa`.
-   - `feat/` funcionalidade nova
-   - `fix/` correção de bug
-   - `chore/` configuração, CI, documentação
+### Por que trabalhamos com branches
+
+Uma **branch** é uma cópia paralela do código onde você trabalha sem afetar ninguém.
+
+- **A `main` sempre funciona.** Ela só recebe código que passou no CI. Quem clona hoje consegue rodar.
+- **Ninguém atropela ninguém.** Oito pessoas mexendo direto na `main` geram conflito o tempo todo. Cada um na sua branch, o conflito só aparece no merge, e em um lugar só.
+- **Todo código é revisado.** A branch vira um PR, e o PR é o lugar onde alguém lê o seu código antes de entrar.
+- **Dá para desfazer.** Se uma ideia deu errado, você apaga a branch. A `main` nem ficou sabendo.
+
+### Como criar uma branch
+
+```bash
+git switch main                       # vai para a main
+git pull                              # baixa o que os outros já juntaram
+git switch -c feat/nome-da-tarefa     # cria a branch nova e já entra nela
+```
+
+Confira em qual branch você está:
+
+```bash
+git branch        # a branch atual aparece com *
+git status        # mostra a branch e os arquivos alterados
+```
+
+Para voltar a uma branch que já existe (sem `-c`):
+
+```bash
+git switch feat/nome-da-tarefa
+```
+
+**Armadilha:** sempre crie a branch a partir da `main` atualizada. Se você criar a partir de outra branch, o seu PR leva junto o código dela.
+
+Prefixos do nome:
+
+- `feat/` funcionalidade nova (ex.: `feat/cancelar-agendamento`)
+- `fix/` correção de bug (ex.: `fix/horario-duplicado`)
+- `chore/` configuração, CI, documentação (ex.: `chore/readme`)
+
+Use letras minúsculas, sem acento e com hífen no lugar de espaço.
+
+### Do commit ao merge
+
+1. Crie a branch (passo acima).
+2. Faça a tarefa. Salve o progresso com commits:
+
+   ```bash
+   git add .
+   git commit -m "feat: cancela agendamento confirmado"
+   ```
+
 3. Código **e** testes na mesma branch.
 4. Rode os testes antes de subir (`dotnet test` no back, `npm run build` no front).
 5. Suba a branch (`git push -u origin feat/nome-da-tarefa`) e abra um PR para a `main`.
