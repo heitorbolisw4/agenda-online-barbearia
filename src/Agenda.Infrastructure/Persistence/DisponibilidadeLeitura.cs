@@ -17,11 +17,14 @@ public class DisponibilidadeLeitura(AgendaDbContext db) : IDisponibilidadeLeitur
 
     public Task<List<Intervalo>> ObterOcupados(Guid profissionalId, DateTimeOffset inicioDia, DateTimeOffset fimDia)
     {
+        DateTimeOffset inicioUtc = inicioDia.ToUniversalTime();
+        DateTimeOffset fimUtc = fimDia.ToUniversalTime();
+    
         return db.Agendamentos.Where( 
             o => o.ProfissionalId == profissionalId &&
             o.Status != Domain.Enum.StatusAgendamento.Cancelado &&
-            o.Inicio < fimDia &&
-            o.Fim >inicioDia )
+            o.Inicio < fimUtc &&
+            o.Fim >inicioUtc )
             .Select( i => Intervalo.Create(inicio: i.Inicio, fim: i.Fim)).ToListAsync();
         
     }
