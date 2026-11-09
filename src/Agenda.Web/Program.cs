@@ -1,8 +1,25 @@
+using Agenda.Application;
+using Agenda.Application.Interface;
+using Agenda.Infrastructure.Persistence;
+using Agenda.Web.Endpoints;
+using Agenda.Web.Exceptions;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+
+var conn = builder.Configuration.GetConnectionString("Agenda");
+builder.Services.AddDbContext<AgendaDbContext>( options => options.UseNpgsql( conn ) );
+builder.Services.AddScoped<IDisponibilidadeLeitura, DisponibilidadeLeitura>();
+builder.Services.AddScoped<ConsultarHorariosLivres>();
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
+
 
 var app = builder.Build();
 
@@ -13,6 +30,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseExceptionHandler();
 
 var summaries = new[]
 {
@@ -32,7 +50,7 @@ app.MapGet("/weatherforecast", () =>
     return forecast;
 })
 .WithName("GetWeatherForecast");
-
+app.MapDisponibilidade();
 app.Run();
 
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)

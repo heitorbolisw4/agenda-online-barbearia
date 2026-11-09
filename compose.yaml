@@ -1,0 +1,13 @@
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: agenda
+      POSTGRES_USER: agenda
+      POSTGRES_PASSWORD: agenda_dev   # senha só de máquina local
+    ports:
+      - "127.0.0.1:5432:5432"          # só o seu PC acessa
+    volumes:
+      - pgdata:/var/lib/postgresql/data  # dados sobrevivem ao desligar
+volumes:
+  pgdata:
