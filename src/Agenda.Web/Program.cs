@@ -1,6 +1,8 @@
 using Agenda.Application;
 using Agenda.Application.Interface;
 using Agenda.Infrastructure.Persistence;
+using Agenda.Web.Endpoints;
+using Agenda.Web.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +16,9 @@ builder.Services.AddDbContext<AgendaDbContext>( options => options.UseNpgsql( co
 builder.Services.AddScoped<IDisponibilidadeLeitura, DisponibilidadeLeitura>();
 builder.Services.AddScoped<ConsultarHorariosLivres>();
 builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 
 
 var app = builder.Build();
@@ -25,6 +30,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseExceptionHandler();
 
 var summaries = new[]
 {
@@ -44,7 +50,7 @@ app.MapGet("/weatherforecast", () =>
     return forecast;
 })
 .WithName("GetWeatherForecast");
-
+app.MapDisponibilidade();
 app.Run();
 
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)

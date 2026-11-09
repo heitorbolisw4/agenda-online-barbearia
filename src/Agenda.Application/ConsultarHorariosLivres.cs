@@ -55,6 +55,7 @@ public class ConsultarHorariosLivres(IDisponibilidadeLeitura leitura, TimeProvid
         var inicioDiaFuso = new DateTimeOffset(inicioDia, offsetDia);
         var fimDiaFuso = new DateTimeOffset(fimDia, offsetDia);
         var ocupados = await _leitura.ObterOcupados(profissionalId, inicioDiaFuso, fimDiaFuso);
+        
 
 
         var duracao = TimeSpan.FromMinutes(servico.DuracaoMin);
