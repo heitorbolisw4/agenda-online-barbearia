@@ -35,6 +35,11 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
                 title = "Domain Exception";
                 detail = domainException.Message;
                 break;
+            case ConflictException conflictException:
+                statusCode = StatusCodes.Status422UnprocessableEntity;
+                title = "Conflict Exception";
+                detail = conflictException.Message;
+                break;
             default:
                 statusCode = StatusCodes.Status500InternalServerError;
                 title = "Server Error";
