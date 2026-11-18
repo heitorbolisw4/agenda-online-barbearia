@@ -23,4 +23,10 @@ public class AgendamentoEscrita(AgendaDbContext db) : IAgendamentoEscrita
             throw new ConflictException("Horário Indisponível!");
         }
     }
+
+    public Task<Agendamento?> ObterPorId(Guid id)
+        => db.Agendamentos.FirstOrDefaultAsync(a => a.Id == id);
+
+    public Task Salvar()
+        => db.SaveChangesAsync();
 }

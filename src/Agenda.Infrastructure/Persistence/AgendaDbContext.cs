@@ -10,6 +10,7 @@ public class AgendaDbContext( DbContextOptions<AgendaDbContext> options ) : DbCo
     public DbSet<Agendamento> Agendamentos => Set<Agendamento>();
     public DbSet<Servico> Servicos => Set<Servico>();
     public DbSet<PeriodoExpediente> Expedientes => Set<PeriodoExpediente>();
+    public DbSet<Profissional> Profissionais => Set<Profissional>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

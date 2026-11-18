@@ -120,4 +120,15 @@ internal class EscritaFake : IAgendamentoEscrita
         Gravados.Add(agendamento);
         return Task.CompletedTask;
     }
+
+    public int Salvamentos { get; private set; }
+
+    public Task<Agendamento?> ObterPorId(Guid id)
+        => Task.FromResult(Gravados.FirstOrDefault(a => a.Id == id));
+
+    public Task Salvar()
+    {
+        Salvamentos++;
+        return Task.CompletedTask;
+    }
 }
