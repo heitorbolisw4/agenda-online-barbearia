@@ -35,6 +35,12 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
                 title = "Domain Exception";
                 detail = domainException.Message;
                 break;
+            case ConflictException conflictException:
+                // 409: o horário já foi pego (por outra pessoa ou outra aba)
+                statusCode = StatusCodes.Status409Conflict;
+                title = "Conflict Exception";
+                detail = conflictException.Message;
+                break;
             default:
                 statusCode = StatusCodes.Status500InternalServerError;
                 title = "Server Error";
