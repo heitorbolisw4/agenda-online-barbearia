@@ -29,10 +29,11 @@ Legenda: ✅ na `main` · 🚧 planejado, ainda não está na `main`
 | --- | --- |
 | Domain: `Intervalo`, `CalculadoraDisponibilidade`, `Agendamento` + testes | ✅ |
 | CI (build e testes em todo PR) | ✅ |
-| Application: casos de uso (agendar, cancelar, listar horários) | 🚧 |
-| Infrastructure: PostgreSQL + Entity Framework Core | 🚧 |
-| API: endpoints reais (hoje só tem o exemplo `/weatherforecast`) | 🚧 |
-| Front-end React em `web/` | 🚧 (pasta ainda não existe) |
+| Application: casos de uso (horários livres, agendar, cancelar, agenda do dia) | ✅ |
+| Infrastructure: PostgreSQL + Entity Framework Core (com trava contra reserva dupla) | ✅ |
+| API: `/servicos`, `/profissionais`, `/disponibilidade`, `/agendamentos`, agenda do dia, cancelar | ✅ |
+| Login do barbeiro e do proprietário | 🚧 |
+| Front-end React em `web/`: reservar e painel do barbeiro | ✅ (gestão do proprietário 🚧) |
 | Testes de integração contra PostgreSQL | 🚧 (só o teste vazio de exemplo) |
 
 ## Stack
@@ -189,7 +190,7 @@ Os nomes exatos (chave da connection string, projeto das migrations) são confir
 
 ## Como rodar o Front-end
 
-🚧 A pasta `web/` ainda não existe. Este é o passo a passo planejado. Quem criar a pasta confirma os comandos neste README.
+O front usa React + Vite. A área pública fica em `web/src/publica/` e o painel do barbeiro em `web/src/barbeiro/`.
 
 ### 1. Instale as ferramentas
 
