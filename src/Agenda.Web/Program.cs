@@ -15,6 +15,8 @@ var conn = builder.Configuration.GetConnectionString("Agenda");
 builder.Services.AddDbContext<AgendaDbContext>( options => options.UseNpgsql( conn ) );
 builder.Services.AddScoped<IDisponibilidadeLeitura, DisponibilidadeLeitura>();
 builder.Services.AddScoped<ConsultarHorariosLivres>();
+builder.Services.AddScoped<IAgendamentoEscrita, AgendamentoEscrita>();
+builder.Services.AddScoped<CriarAgendamento>();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
@@ -51,6 +53,7 @@ app.MapGet("/weatherforecast", () =>
 })
 .WithName("GetWeatherForecast");
 app.MapDisponibilidade();
+app.MapAgendamentos();
 app.Run();
 
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)

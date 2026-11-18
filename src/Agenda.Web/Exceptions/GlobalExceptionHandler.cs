@@ -36,7 +36,8 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
                 detail = domainException.Message;
                 break;
             case ConflictException conflictException:
-                statusCode = StatusCodes.Status422UnprocessableEntity;
+                // 409: o horário já foi pego (por outra pessoa ou outra aba)
+                statusCode = StatusCodes.Status409Conflict;
                 title = "Conflict Exception";
                 detail = conflictException.Message;
                 break;
