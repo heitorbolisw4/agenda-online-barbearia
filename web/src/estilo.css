@@ -1,7 +1,7 @@
 :root {
   /* Paleta da barbearia, tema escuro: fundo preto, texto branco, destaque amarelo */
-  --fundo: #130303; --cartao: #130303; --texto: #F7F7F7; --mudo: #CDD1DE; --linha: #6D676E;
-  --destaque: #F5B83C; --destaque-suave: #3A2A0E; --erro: #FFB4AB; --erro-fundo: #4A1414;
+  --fundo: #0A0A0A; --cartao: #0A0A0A; --texto: #F7F7F7; --mudo: #CDD1DE; --linha: #6D676E;
+  --destaque: #F5B83C; --destaque-suave: #2B2210; --erro: #FFB4AB; --erro-fundo: #3A1212;
   color-scheme: dark;
   font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
   color: var(--texto); background: var(--fundo);
@@ -59,3 +59,13 @@ input:focus, select:focus, button:focus-visible { outline: 2px solid var(--desta
   .etapa { animation: entrar .2s ease-out; }
   @keyframes entrar { from { opacity: 0; transform: translateX(12px); } to { opacity: 1; transform: none; } }
 }
+
+/* Etapa de horários: agrupada por período, grade arejada */
+.periodo { display: flex; flex-direction: column; gap: 8px; }
+.periodo + .periodo { margin-top: 10px; }
+.periodo h3 { margin: 0; font-size: .75rem; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--mudo); }
+.grade-horarios { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.grade-horarios button { background: transparent; border: 1px solid var(--linha); font-variant-numeric: tabular-nums; }
+.grade-horarios button:hover { border-color: var(--destaque); }
+.grade-horarios button.escolhido { background: var(--destaque); color: var(--fundo); border-color: var(--destaque); box-shadow: none; }
+@media (max-width: 360px) { .grade-horarios { grid-template-columns: repeat(3, 1fr); } }
