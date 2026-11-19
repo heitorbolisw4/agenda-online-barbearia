@@ -46,6 +46,7 @@ export function hora(iso) {
 }
 
 export function dataPorExtenso(data) {
-  return new Intl.DateTimeFormat('pt-BR', { timeZone: 'UTC', weekday: 'long', day: '2-digit', month: '2-digit' })
+  const texto = new Intl.DateTimeFormat('pt-BR', { timeZone: 'UTC', weekday: 'long', day: '2-digit', month: '2-digit' })
     .format(new Date(data + 'T12:00:00Z'))
+  return texto.charAt(0).toUpperCase() + texto.slice(1) // "Sexta-feira, 20/11"
 }
