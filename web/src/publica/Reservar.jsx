@@ -1,13 +1,24 @@
 import { useEffect, useState } from 'react'
 import { api, hojeEmSaoPaulo, somarDias, hora, dataPorExtenso } from '../api.js'
 
-// Fluxo do cliente: serviço -> barbeiro e data -> horário -> dados -> comprovante.
+// Reserva em etapas: uma pergunta por tela. Escolheu, avança.
+const ETAPAS = ['servico', 'barbeiro', 'dia', 'horario', 'dados']
+const TITULOS = {
+  servico: 'Qual serviço?',
+  barbeiro: 'Com qual barbeiro?',
+  dia: 'Que dia?',
+  horario: 'Que horário?',
+  dados: 'Seus dados',
+}
+const DIAS_VISIVEIS = 14
+
 export default function Reservar() {
+  const [etapa, setEtapa] = useState('servico')
   const [servicos, setServicos] = useState([])
   const [profissionais, setProfissionais] = useState([])
   const [servico, setServico] = useState(null)
   const [profissional, setProfissional] = useState(null)
-  const [data, setData] = useState(hojeEmSaoPaulo())
+  const [data, setData] = useState(null)
   const [horarios, setHorarios] = useState(null)
   const [horario, setHorario] = useState(null)
   const [nome, setNome] = useState('')
@@ -22,17 +33,20 @@ export default function Reservar() {
       .catch(() => setErro('Não foi possível falar com a API. Ela está rodando?'))
   }, [])
 
-  // Sempre que muda serviço, barbeiro ou data, busca os horários livres de novo.
+  // Ao chegar na etapa de horário, busca os horários livres daquele dia.
   useEffect(() => {
-    if (!servico || !profissional) return
+    if (etapa !== 'horario') return
     let ignorar = false
     setHorarios(null)
-    setHorario(null)
     api.horariosLivres(profissional.id, servico.id, data)
       .then((h) => { if (!ignorar) setHorarios(h) })
       .catch((e) => setErro(e.message))
     return () => { ignorar = true }
-  }, [servico, profissional, data])
+  }, [etapa, servico, profissional, data])
+
+  const indice = ETAPAS.indexOf(etapa)
+  const avancar = () => { setErro(''); setEtapa(ETAPAS[indice + 1]) }
+  const voltar = () => { setErro(''); setEtapa(ETAPAS[indice - 1]) }
 
   async function confirmar(e) {
     e.preventDefault()
@@ -49,9 +63,10 @@ export default function Reservar() {
       setComprovante(reserva)
     } catch (e) {
       if (e.status === 409) {
-        setErro('Alguém acabou de pegar esse horário. Escolha outro.')
+        // Alguém pegou o horário antes: volta para a escolha de horário.
         setHorario(null)
-        setHorarios(await api.horariosLivres(profissional.id, servico.id, data))
+        setEtapa('horario')
+        setErro('Alguém acabou de pegar esse horário. Escolha outro.')
       } else {
         setErro(e.message)
       }
@@ -61,8 +76,8 @@ export default function Reservar() {
   }
 
   function recomecar() {
-    setComprovante(null); setServico(null); setProfissional(null); setHorario(null)
-    setNome(''); setTelefone(''); setErro('')
+    setComprovante(null); setServico(null); setProfissional(null); setData(null); setHorario(null)
+    setNome(''); setTelefone(''); setErro(''); setEtapa('servico')
   }
 
   if (comprovante) {
@@ -73,72 +88,91 @@ export default function Reservar() {
         <p>{dataPorExtenso(data)}, das {hora(comprovante.inicio)} às {hora(comprovante.fim)}</p>
         <p>Cliente: {comprovante.clienteNome}</p>
         <p className="mudo">Nº da reserva: {comprovante.id}</p>
-        <button onClick={recomecar}>Fazer outra reserva</button>
+        <button className="principal" onClick={recomecar}>Fazer outra reserva</button>
       </section>
     )
   }
 
+  const hoje = hojeEmSaoPaulo()
+  const dias = Array.from({ length: DIAS_VISIVEIS }, (_, i) => somarDias(hoje, i))
+
   return (
     <div className="fluxo">
+      <div className="progresso" aria-label={`Etapa ${indice + 1} de ${ETAPAS.length}`}>
+        <span className="mudo">Etapa {indice + 1} de {ETAPAS.length}</span>
+        <div className="barra"><div style={{ width: `${((indice + 1) / ETAPAS.length) * 100}%` }} /></div>
+      </div>
+
+      {/* O que já foi escolhido, para o cliente não se perder. */}
+      {indice > 0 && (
+        <p className="escolhas">
+          {servico && <span>{servico.nome}</span>}
+          {indice > 1 && profissional && <span>{profissional.nome}</span>}
+          {indice > 2 && data && <span>{dataPorExtenso(data)}</span>}
+          {indice > 3 && horario && <span>{hora(horario.inicio)}</span>}
+        </p>
+      )}
+
       {erro && <p className="erro">{erro}</p>}
 
-      <section className="cartao">
-        <h2>1. Serviço</h2>
-        <div className="opcoes">
-          {servicos.map((s) => (
-            <button key={s.id} className={servico?.id === s.id ? 'escolhido' : ''} onClick={() => setServico(s)}>
-              {s.nome} <span className="mudo">{s.duracaoMin} min</span>
+      <section className="cartao etapa" key={etapa}>
+        <h2>{TITULOS[etapa]}</h2>
+
+        {etapa === 'servico' && (
+          <div className="lista">
+            {servicos.map((s) => (
+              <button key={s.id} onClick={() => { setServico(s); avancar() }}>
+                {s.nome} <span className="mudo">{s.duracaoMin} min</span>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {etapa === 'barbeiro' && (
+          <div className="lista">
+            {profissionais.map((p) => (
+              <button key={p.id} onClick={() => { setProfissional(p); avancar() }}>{p.nome}</button>
+            ))}
+          </div>
+        )}
+
+        {etapa === 'dia' && (
+          <div className="grade">
+            {dias.map((d) => (
+              <button key={d} className="botao-dia" onClick={() => { setData(d); avancar() }}>
+                {dataPorExtenso(d)}
+              </button>
+            ))}
+          </div>
+        )}
+
+        {etapa === 'horario' && (
+          <>
+            {horarios === null && <p className="mudo">Carregando…</p>}
+            {horarios?.length === 0 && <p className="mudo">Sem horários livres neste dia. Volte e escolha outro dia.</p>}
+            <div className="grade">
+              {horarios?.map((h) => (
+                <button key={h.inicio} onClick={() => { setHorario(h); avancar() }}>{hora(h.inicio)}</button>
+              ))}
+            </div>
+          </>
+        )}
+
+        {etapa === 'dados' && (
+          <form onSubmit={confirmar} className="formulario">
+            <label>Nome<input value={nome} onChange={(e) => setNome(e.target.value)} required autoFocus /></label>
+            <label>Celular (WhatsApp)<input value={telefone} onChange={(e) => setTelefone(e.target.value)} inputMode="tel" required /></label>
+            <p className="resumo">
+              {servico.nome} com {profissional.nome}, {dataPorExtenso(data)} às {hora(horario.inicio)}
+            </p>
+            <button type="submit" className="principal" disabled={enviando}>
+              {enviando ? 'Confirmando…' : 'Confirmar reserva'}
             </button>
-          ))}
-        </div>
+          </form>
+        )}
       </section>
 
-      {servico && (
-        <section className="cartao">
-          <h2>2. Barbeiro e dia</h2>
-          <div className="opcoes">
-            {profissionais.map((p) => (
-              <button key={p.id} className={profissional?.id === p.id ? 'escolhido' : ''} onClick={() => setProfissional(p)}>
-                {p.nome}
-              </button>
-            ))}
-          </div>
-          <div className="dia">
-            <button disabled={data <= hojeEmSaoPaulo()} onClick={() => setData(somarDias(data, -1))}>◀</button>
-            <span>{dataPorExtenso(data)}</span>
-            <button onClick={() => setData(somarDias(data, 1))}>▶</button>
-          </div>
-        </section>
-      )}
-
-      {servico && profissional && (
-        <section className="cartao">
-          <h2>3. Horário</h2>
-          {horarios === null && <p className="mudo">Carregando…</p>}
-          {horarios?.length === 0 && <p className="mudo">Sem horários livres neste dia. Tente outro.</p>}
-          <div className="grade">
-            {horarios?.map((h) => (
-              <button key={h.inicio} className={horario?.inicio === h.inicio ? 'escolhido' : ''} onClick={() => setHorario(h)}>
-                {hora(h.inicio)}
-              </button>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {horario && (
-        <form className="cartao" onSubmit={confirmar}>
-          <h2>4. Seus dados</h2>
-          <label>Nome<input value={nome} onChange={(e) => setNome(e.target.value)} required /></label>
-          <label>Celular (WhatsApp)<input value={telefone} onChange={(e) => setTelefone(e.target.value)} inputMode="tel" required /></label>
-          <p className="resumo">
-            {servico.nome} com {profissional.nome}, {dataPorExtenso(data)} às {hora(horario.inicio)}
-          </p>
-          <button type="submit" className="principal" disabled={enviando}>
-            {enviando ? 'Confirmando…' : 'Confirmar reserva'}
-          </button>
-        </form>
-      )}
+      {indice > 0 && <button className="link" onClick={voltar}>← Voltar</button>}
     </div>
   )
 }

@@ -1,6 +1,6 @@
 :root {
   /* Paleta da barbearia, tema escuro: fundo preto, texto branco, destaque amarelo */
-  --fundo: #130303; --cartao: #1E1212; --texto: #F7F7F7; --mudo: #CDD1DE; --linha: #6D676E;
+  --fundo: #130303; --cartao: #130303; --texto: #F7F7F7; --mudo: #CDD1DE; --linha: #6D676E;
   --destaque: #F5B83C; --destaque-suave: #3A2A0E; --erro: #FFB4AB; --erro-fundo: #4A1414;
   color-scheme: dark;
   font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -24,7 +24,7 @@ button.escolhido { border-color: var(--destaque); background: var(--destaque-sua
 button.principal { background: var(--destaque); color: var(--fundo); border-color: var(--destaque); font-weight: 700; }
 button.link { border: none; background: none; color: var(--texto); text-decoration: underline; text-decoration-color: var(--destaque); text-decoration-thickness: 2px; align-self: flex-start; padding: 0; min-height: auto; }
 .dia { display: flex; align-items: center; gap: 12px; }
-.dia span { text-transform: capitalize; min-width: 170px; text-align: center; }
+.dia span { min-width: 170px; text-align: center; }
 label { display: flex; flex-direction: column; gap: 4px; font-weight: 600; font-size: .9rem; }
 input, select { font: inherit; background: var(--fundo); color: var(--texto); padding: 8px; border: 1px solid var(--linha); border-radius: 6px; font-weight: 400; }
 .mudo { color: var(--mudo); font-weight: 400; font-size: .9em; }
@@ -44,3 +44,18 @@ input, select { font: inherit; background: var(--fundo); color: var(--texto); pa
 }
 a { color: var(--mudo); }
 input:focus, select:focus, button:focus-visible { outline: 2px solid var(--destaque); outline-offset: 1px; }
+
+/* Reserva passo a passo */
+.progresso { display: flex; flex-direction: column; gap: 6px; }
+.barra { height: 6px; background: var(--linha); border-radius: 999px; overflow: hidden; }
+.barra div { height: 100%; background: var(--destaque); transition: width .25s; }
+.escolhas { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; }
+.escolhas span { border: 1px solid var(--destaque); color: var(--destaque); border-radius: 999px; padding: 2px 10px; font-size: .85rem; }
+.lista { display: flex; flex-direction: column; gap: 8px; }
+.lista button { text-align: left; padding: 14px; display: flex; justify-content: space-between; }
+.lista button:hover, .grade button:hover { border-color: var(--destaque); }
+.formulario { display: flex; flex-direction: column; gap: 10px; }
+@media (prefers-reduced-motion: no-preference) {
+  .etapa { animation: entrar .2s ease-out; }
+  @keyframes entrar { from { opacity: 0; transform: translateX(12px); } to { opacity: 1; transform: none; } }
+}
