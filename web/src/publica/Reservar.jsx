@@ -11,6 +11,11 @@ const TITULOS = {
   dados: 'Seus dados',
 }
 const DIAS_VISIVEIS = 14
+const PERIODOS = [
+  { nome: 'Manhã', de: 0, ate: 12 },
+  { nome: 'Tarde', de: 12, ate: 18 },
+  { nome: 'Noite', de: 18, ate: 24 },
+]
 
 export default function Reservar() {
   const [etapa, setEtapa] = useState('servico')
@@ -152,11 +157,27 @@ export default function Reservar() {
           <>
             {horarios === null && <p className="mudo">Carregando…</p>}
             {horarios?.length === 0 && <p className="mudo">Sem horários livres neste dia. Volte e escolha outro dia.</p>}
-            <div className="grade">
-              {horarios?.map((h) => (
-                <button key={h.inicio} onClick={() => { setHorario(h); avancar() }}>{hora(h.inicio)}</button>
-              ))}
-            </div>
+            {PERIODOS.map(({ nome, de, ate }) => {
+              // A API já devolve só horários livres; aqui só separamos por período do dia.
+              const doPeriodo = (horarios ?? []).filter((h) => {
+                const hh = Number(hora(h.inicio).slice(0, 2))
+                return hh >= de && hh < ate
+              })
+              if (doPeriodo.length === 0) return null
+              return (
+                <div key={nome} className="periodo">
+                  <h3>{nome}</h3>
+                  <div className="grade-horarios">
+                    {doPeriodo.map((h) => (
+                      <button key={h.inicio} className={horario?.inicio === h.inicio ? 'escolhido' : ''}
+                        onClick={() => { setHorario(h); avancar() }}>
+                        {hora(h.inicio)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )
+            })}
           </>
         )}
 
