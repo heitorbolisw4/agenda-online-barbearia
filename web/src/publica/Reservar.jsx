@@ -94,7 +94,9 @@ export default function Reservar() {
   }
 
   const hoje = hojeEmSaoPaulo()
+  // A barbearia não abre no domingo: nem mostra.
   const dias = Array.from({ length: DIAS_VISIVEIS }, (_, i) => somarDias(hoje, i))
+    .filter((d) => new Date(d + 'T12:00:00Z').getUTCDay() !== 0)
 
   return (
     <div className="fluxo">
