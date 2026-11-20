@@ -1,10 +1,12 @@
+using System.Text.RegularExpressions;
 using Agenda.Domain.Enum;
 using Agenda.Domain.Exceptions;
 
 namespace Agenda.Domain;
 
-public class Agendamento
+public partial class Agendamento
 {
+    public const int NomeMaxLength = 50;
     private Agendamento(Guid profissionalId, Guid servicoId, string servicoNome, int duracaoMin, string clienteNome, string clienteTelefone, DateTimeOffset inicio, DateTimeOffset fim, Origem origem)
     {
 
@@ -43,9 +45,10 @@ public class Agendamento
         ValidProfissionalId(profissionalId);
         ValidServico(servicoId, servicoNome);
         ValidDuracao(duracaoMin);
-        ValidCliente(clienteNome, clienteTelefone);
+        var nomeNormalizado = NormalizarNome(clienteNome);
+        var telefoneNormalizado = NormalizarTelefone(clienteTelefone);
         var fim = inicio.AddMinutes(duracaoMin);
-        return new Agendamento(profissionalId, servicoId, servicoNome ,duracaoMin, clienteNome, clienteTelefone, inicio, fim, origem);
+        return new Agendamento(profissionalId, servicoId, servicoNome ,duracaoMin, nomeNormalizado, telefoneNormalizado, inicio, fim, origem);
     }
 
     public void Cancelar()
@@ -85,18 +88,57 @@ public class Agendamento
         }
     }
 
-    private static void ValidCliente(string nome, string telefone)
+    private static string NormalizarNome(string nome)
     {
-        if (string.IsNullOrWhiteSpace(nome))
+        if(string.IsNullOrWhiteSpace(nome))
         {
             throw new DomainException("O Nome do Cliente deve ser informado!");
         }
+        var normalizado = MultipleSpaces().Replace(nome.Trim(), " ");
+        foreach( char c in normalizado)
+        {
+            bool permitido = normalizado.All(c => char.IsLetter(c) || c is ' ' or '\'' or '-');
+            if(!permitido)
+            {
+                throw new DomainException("O nome tem caracteres invalidos!");        
+            }
+        }
+
+        if( normalizado.Length < 2 || normalizado.Length > NomeMaxLength)
+        {
+            throw new DomainException($"O nome do cliente deve ter entre 2 e {NomeMaxLength} caracteres");
+        }
+        return normalizado;
+    }
+
+    private static string NormalizarTelefone(string telefone)
+    {
+        
         if (string.IsNullOrWhiteSpace(telefone))
         {
             throw new DomainException("O Telefone do Cliente deve ser informado!");
             
         }
+        // Tira só o enfeite (espaço, parênteses, hífen, ponto, +). Letra continua lá.
+        var digits = Formatacao().Replace(telefone, "");
+        if(!digits.All(char.IsAsciiDigit))
+        {
+            throw new DomainException("O Telefone deve conter apenas numeros");
+        }
+        if(digits.Length is 12 or 13 && digits.StartsWith("55"))
+        {
+            digits = digits[2..];
+        }
+        if(digits.Length is not (10 or 11))
+        {
+            throw new DomainException("O Telefone deve ter DDD + numero(10 ou 11 digitos)");
+        }
+        return digits;
     }
 
-    
+    [GeneratedRegex(@"\s+")]
+    private static partial Regex MultipleSpaces();
+
+    [GeneratedRegex(@"[\s().+-]")]
+    private static partial Regex Formatacao();
 }
