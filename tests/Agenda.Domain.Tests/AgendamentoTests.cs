@@ -90,6 +90,32 @@ public class AgendamentoTests
         Assert.Equal(esperado, agendamento.ClienteTelefone);
     }
 
+    [Theory]
+    [InlineData("$ilva")]
+    [InlineData("a")]
+    [InlineData("João-@liveira")]
+    [InlineData("J0ao")]
+    public void Criar_Agendamento_NomeClienteInvalido_LancaExcecao(string nome)
+    {
+        Assert.Throws<DomainException>(() => Agendamento.Criar(Guid.NewGuid(), Guid.NewGuid(), "Corte", 30, nome, "3499999999", Hora(9, 30),  Origem.Web));
+    }
+
+
+    [Theory]
+    [InlineData("  João-Silva  ", "João-Silva")]
+    [InlineData("  João   Silva  ", "João Silva")]
+    [InlineData("Manuela D'avila", "Manuela D'avila")]
+    public void Criar_Agendamento_NomeClienteValido_ResultadoEsperado(string nome, string esperado)
+    {
+        var agendamento = Agendamento.Criar(Guid.NewGuid(), Guid.NewGuid(), "Corte", 30, nome, "3499999999", Hora(9, 30),  Origem.Web);
+
+        Assert.Equal(esperado, agendamento.ClienteNome);
+    }
+
+
+
+
+
     [Fact]
     public void Criar_ProfissionalIdVazio_LancaExcecao()
     {

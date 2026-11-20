@@ -6,6 +6,7 @@ namespace Agenda.Domain;
 
 public partial class Agendamento
 {
+    public const int NomeMaxLength = 50;
     private Agendamento(Guid profissionalId, Guid servicoId, string servicoNome, int duracaoMin, string clienteNome, string clienteTelefone, DateTimeOffset inicio, DateTimeOffset fim, Origem origem)
     {
 
@@ -44,10 +45,10 @@ public partial class Agendamento
         ValidProfissionalId(profissionalId);
         ValidServico(servicoId, servicoNome);
         ValidDuracao(duracaoMin);
-        ValidNome(clienteNome);
+        var nomeNormalizado = NormalizarNome(clienteNome);
         var telefoneNormalizado = NormalizarTelefone(clienteTelefone);
         var fim = inicio.AddMinutes(duracaoMin);
-        return new Agendamento(profissionalId, servicoId, servicoNome ,duracaoMin, clienteNome, telefoneNormalizado, inicio, fim, origem);
+        return new Agendamento(profissionalId, servicoId, servicoNome ,duracaoMin, nomeNormalizado, telefoneNormalizado, inicio, fim, origem);
     }
 
     public void Cancelar()
@@ -87,12 +88,27 @@ public partial class Agendamento
         }
     }
 
-    private static void ValidNome(string nome)
+    private static string NormalizarNome(string nome)
     {
         if(string.IsNullOrWhiteSpace(nome))
         {
             throw new DomainException("O Nome do Cliente deve ser informado!");
         }
+        var normalizado = MultipleSpaces().Replace(nome.Trim(), " ");
+        foreach( char c in normalizado)
+        {
+            bool permitido = normalizado.All(c => char.IsLetter(c) || c is ' ' or '\'' or '-');
+            if(!permitido)
+            {
+                throw new DomainException("O nome tem caracteres invalidos!");        
+            }
+        }
+
+        if( normalizado.Length <= 2 || normalizado.Length > NomeMaxLength)
+        {
+            throw new DomainException($"O nome do cliente deve ter no maximo {NomeMaxLength} caracteres");
+        }
+        return normalizado;
     }
 
     private static string NormalizarTelefone(string telefone)
@@ -119,6 +135,9 @@ public partial class Agendamento
         }
         return digits;
     }
+
+    [GeneratedRegex(@"\s+")]
+    private static partial Regex MultipleSpaces();
 
     [GeneratedRegex(@"[\s().+-]")]
     private static partial Regex Formatacao();
