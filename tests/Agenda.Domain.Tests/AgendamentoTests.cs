@@ -105,14 +105,13 @@ public class AgendamentoTests
     [InlineData("  João-Silva  ", "João-Silva")]
     [InlineData("  João   Silva  ", "João Silva")]
     [InlineData("Manuela D'avila", "Manuela D'avila")]
+    [InlineData("Zé", "Zé")]
     public void Criar_Agendamento_NomeClienteValido_ResultadoEsperado(string nome, string esperado)
     {
         var agendamento = Agendamento.Criar(Guid.NewGuid(), Guid.NewGuid(), "Corte", 30, nome, "3499999999", Hora(9, 30),  Origem.Web);
 
         Assert.Equal(esperado, agendamento.ClienteNome);
     }
-
-
 
 
 

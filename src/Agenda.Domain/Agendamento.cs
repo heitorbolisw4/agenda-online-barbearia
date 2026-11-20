@@ -104,9 +104,9 @@ public partial class Agendamento
             }
         }
 
-        if( normalizado.Length <= 2 || normalizado.Length > NomeMaxLength)
+        if( normalizado.Length < 2 || normalizado.Length > NomeMaxLength)
         {
-            throw new DomainException($"O nome do cliente deve ter no maximo {NomeMaxLength} caracteres");
+            throw new DomainException($"O nome do cliente deve ter entre 2 e {NomeMaxLength} caracteres");
         }
         return normalizado;
     }
