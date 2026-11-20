@@ -1,9 +1,10 @@
+using System.Text.RegularExpressions;
 using Agenda.Domain.Enum;
 using Agenda.Domain.Exceptions;
 
 namespace Agenda.Domain;
 
-public class Agendamento
+public partial class Agendamento
 {
     private Agendamento(Guid profissionalId, Guid servicoId, string servicoNome, int duracaoMin, string clienteNome, string clienteTelefone, DateTimeOffset inicio, DateTimeOffset fim, Origem origem)
     {
@@ -43,9 +44,10 @@ public class Agendamento
         ValidProfissionalId(profissionalId);
         ValidServico(servicoId, servicoNome);
         ValidDuracao(duracaoMin);
-        ValidCliente(clienteNome, clienteTelefone);
+        ValidNome(clienteNome);
+        var telefoneNormalizado = NormalizarTelefone(clienteTelefone);
         var fim = inicio.AddMinutes(duracaoMin);
-        return new Agendamento(profissionalId, servicoId, servicoNome ,duracaoMin, clienteNome, clienteTelefone, inicio, fim, origem);
+        return new Agendamento(profissionalId, servicoId, servicoNome ,duracaoMin, clienteNome, telefoneNormalizado, inicio, fim, origem);
     }
 
     public void Cancelar()
@@ -85,18 +87,39 @@ public class Agendamento
         }
     }
 
-    private static void ValidCliente(string nome, string telefone)
+    private static void ValidNome(string nome)
     {
-        if (string.IsNullOrWhiteSpace(nome))
+        if(string.IsNullOrWhiteSpace(nome))
         {
             throw new DomainException("O Nome do Cliente deve ser informado!");
         }
+    }
+
+    private static string NormalizarTelefone(string telefone)
+    {
+        
         if (string.IsNullOrWhiteSpace(telefone))
         {
             throw new DomainException("O Telefone do Cliente deve ser informado!");
             
         }
+        // Tira só o enfeite (espaço, parênteses, hífen, ponto, +). Letra continua lá.
+        var digits = Formatacao().Replace(telefone, "");
+        if(!digits.All(char.IsAsciiDigit))
+        {
+            throw new DomainException("O Telefone deve conter apenas numeros");
+        }
+        if(digits.Length is 12 or 13 && digits.StartsWith("55"))
+        {
+            digits = digits[2..];
+        }
+        if(digits.Length is not (10 or 11))
+        {
+            throw new DomainException("O Telefone deve ter DDD + numero(10 ou 11 digitos)");
+        }
+        return digits;
     }
 
-    
+    [GeneratedRegex(@"[\s().+-]")]
+    private static partial Regex Formatacao();
 }
