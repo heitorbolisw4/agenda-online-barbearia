@@ -1,6 +1,7 @@
 using Agenda.Application;
 using Agenda.Application.Interface;
 using Agenda.Infrastructure.Persistence;
+using Agenda.Infrastructure.Security;
 using Agenda.Web.Endpoints;
 using Agenda.Web.Exceptions;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +21,7 @@ builder.Services.AddScoped<CriarAgendamento>();
 builder.Services.AddScoped<ICatalogoLeitura, CatalogoLeitura>();
 builder.Services.AddScoped<ListarAgendaDoDia>();
 builder.Services.AddScoped<CancelarAgendamento>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 // CORS: deixa o front React (outra porta) chamar a API pelo navegador.
 // Origens em "Cors:Origens"; sem config, libera o Vite padrão (localhost:5173).
@@ -40,7 +42,9 @@ if (app.Environment.IsDevelopment())
 
     // Banco vazio na máquina local? Cria barbeiros, serviços e expedientes de exemplo.
     using var scope = app.Services.CreateScope();
-    await SeedDesenvolvimento.Executar(scope.ServiceProvider.GetRequiredService<AgendaDbContext>());
+    var senhaDev = app.Configuration["Seed:SenhaDev"] ?? throw new InvalidOperationException("Configure Seed:SenhaDev no user-secrets");
+
+    await SeedDesenvolvimento.Executar(scope.ServiceProvider.GetRequiredService<AgendaDbContext>(), senhaDev);
 }
 
 app.UseHttpsRedirection();
@@ -65,6 +69,7 @@ app.MapGet("/weatherforecast", () =>
     return forecast;
 })
 .WithName("GetWeatherForecast");
+app.MapAutenticacao();
 app.MapDisponibilidade();
 app.MapAgendamentos();
 app.MapCatalogo();

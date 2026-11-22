@@ -7,7 +7,7 @@ namespace Agenda.Infrastructure.Persistence;
 // Só roda se o banco estiver vazio. Nomes genéricos de propósito (repo público).
 public static class SeedDesenvolvimento
 {
-    public static async Task Executar(AgendaDbContext db)
+    public static async Task Executar(AgendaDbContext db, string senhaDev)
     {
         if (await db.Profissionais.AnyAsync() || await db.Servicos.AnyAsync())
         {
@@ -23,7 +23,9 @@ public static class SeedDesenvolvimento
         string[] nomes = ["Barbeiro 1", "Barbeiro 2", "Barbeiro 3", "Barbeiro 4"];
         foreach (var nome in nomes)
         {
-            var profissional = Profissional.Criar(nome);
+            var login = nome.Replace(" ", "").ToLower();
+            var hash = BCrypt.Net.BCrypt.HashPassword(senhaDev);
+            var profissional = Profissional.Criar(nome, login, hash);
             db.Profissionais.Add(profissional);
 
             // Segunda a sábado, 09:00 às 20:00.
