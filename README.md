@@ -171,6 +171,17 @@ Ainda não está na `main`. O plano:
    dotnet user-secrets set "ConnectionStrings:Agenda" "Host=localhost;Database=agenda;Username=postgres;Password=SUA_SENHA" --project src/Agenda.Web
    ```
 
+   O login do barbeiro precisa de mais 2 segredos (sem eles a API não sobe):
+
+   ```powershell
+   # senha dos barbeiros de exemplo (barbeiro1 a barbeiro4) que o seed cria
+   dotnet user-secrets set "Seed:SenhaDev" "ESCOLHA_UMA_SENHA" --project src/Agenda.Web
+
+   # chave que assina o token do login: aleatória, gerada na hora
+   $b = New-Object byte[] 48; [System.Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($b)
+   dotnet user-secrets set "JwtSettings:Key" ([Convert]::ToBase64String($b)) --project src/Agenda.Web
+   ```
+
 3. Instalar a ferramenta do EF Core e criar as tabelas:
 
    ```bash
@@ -191,6 +202,8 @@ Os nomes exatos (chave da connection string, projeto das migrations) são confir
 ## Como rodar o Front-end
 
 O front usa React + Vite. A área pública fica em `web/src/publica/` e o painel do barbeiro em `web/src/barbeiro/`.
+
+Endereços: o cliente usa `http://localhost:5173/`. O barbeiro usa `http://localhost:5173/#/painel` e entra com login e senha. Não há link de um para o outro.
 
 ### 1. Instale as ferramentas
 
