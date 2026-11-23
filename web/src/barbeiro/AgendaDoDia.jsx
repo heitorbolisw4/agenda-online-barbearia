@@ -1,34 +1,25 @@
 import { useEffect, useState } from 'react'
-import { api, hojeEmSaoPaulo, somarDias, hora, dataPorExtenso } from '../api.js'
+import { api, sessao, hojeEmSaoPaulo, somarDias, hora, dataPorExtenso } from '../api.js'
 
 // Painel do barbeiro: agenda de um dia, com opção de cancelar.
-// Ainda sem login: o barbeiro escolhe o próprio nome na lista.
+// Só aparece depois do login. A API descobre o barbeiro pelo token, não pela tela.
 export default function AgendaDoDia() {
-  const [profissionais, setProfissionais] = useState([])
-  const [profissionalId, setProfissionalId] = useState('')
   const [data, setData] = useState(hojeEmSaoPaulo())
   const [agenda, setAgenda] = useState(null)
   const [erro, setErro] = useState('')
-
-  useEffect(() => {
-    api.profissionais()
-      .then((p) => { setProfissionais(p); if (p.length) setProfissionalId(p[0].id) })
-      .catch(() => setErro('Não foi possível falar com a API. Ela está rodando?'))
-  }, [])
 
   const [versao, setVersao] = useState(0)
   const carregar = () => setVersao((v) => v + 1)
 
   useEffect(() => {
-    if (!profissionalId) return
     // Se o usuário trocar de dia rápido, ignora a resposta da busca antiga.
     let ignorar = false
     setAgenda(null)
-    api.agendaDoDia(profissionalId, data)
+    api.minhaAgenda(data)
       .then((a) => { if (!ignorar) setAgenda(a) })
       .catch((e) => setErro(e.message))
     return () => { ignorar = true }
-  }, [profissionalId, data, versao])
+  }, [data, versao])
 
   async function cancelar(item) {
     if (!window.confirm(`Cancelar ${item.servicoNome} de ${item.clienteNome} às ${hora(item.inicio)}?`)) return
@@ -47,12 +38,10 @@ export default function AgendaDoDia() {
       {erro && <p className="erro">{erro}</p>}
 
       <section className="cartao">
-        <label>
-          Barbeiro
-          <select value={profissionalId} onChange={(e) => setProfissionalId(e.target.value)}>
-            {profissionais.map((p) => <option key={p.id} value={p.id}>{p.nome}</option>)}
-          </select>
-        </label>
+        <div className="quem-logou">
+          <span>Olá, <b>{sessao.nome()}</b></span>
+          <button className="link" onClick={() => sessao.sair()}>Sair</button>
+        </div>
         <div className="dia">
           <button onClick={() => setData(somarDias(data, -1))}>◀</button>
           <span>{dataPorExtenso(data)}</span>

@@ -18,7 +18,7 @@ public class CancelarAgendamentoTests
         var agendamento = NovoAgendamento();
         await escrita.AdicionarAgendamento(agendamento);
 
-        var resultado = await new CancelarAgendamento(escrita).Executar(agendamento.Id);
+        var resultado = await new CancelarAgendamento(escrita).Executar(agendamento.Id, agendamento.ProfissionalId);
 
         Assert.Equal(StatusAgendamento.Cancelado, resultado.Status);
         Assert.Equal(1, escrita.Salvamentos);
@@ -29,7 +29,7 @@ public class CancelarAgendamentoTests
     {
         var escrita = new EscritaFake();
 
-        await Assert.ThrowsAsync<NotFoundException>(() => new CancelarAgendamento(escrita).Executar(Guid.CreateVersion7()));
+        await Assert.ThrowsAsync<NotFoundException>(() => new CancelarAgendamento(escrita).Executar(Guid.CreateVersion7(), Guid.CreateVersion7()));
     }
 
     [Fact]
@@ -39,9 +39,24 @@ public class CancelarAgendamentoTests
         var agendamento = NovoAgendamento();
         await escrita.AdicionarAgendamento(agendamento);
         var sut = new CancelarAgendamento(escrita);
-        await sut.Executar(agendamento.Id);
+        await sut.Executar(agendamento.Id, agendamento.ProfissionalId);
 
-        await Assert.ThrowsAsync<DomainException>(() => sut.Executar(agendamento.Id));
+        await Assert.ThrowsAsync<DomainException>(() => sut.Executar(agendamento.Id, agendamento.ProfissionalId));
         Assert.Equal(1, escrita.Salvamentos);
+    }
+
+    [Fact]
+    public async Task Cancelar_DeOutroProfissional_LancaNotFoundeNaoSalva()
+    {
+        var escrita = new EscritaFake();
+        var agendamento = NovoAgendamento();
+        await escrita.AdicionarAgendamento(agendamento);
+
+        var outroBarbeiro = Guid.CreateVersion7();
+
+        await Assert.ThrowsAsync<NotFoundException>(() => new CancelarAgendamento(escrita).Executar(agendamento.Id, outroBarbeiro));
+        Assert.Equal(StatusAgendamento.Confirmado, agendamento.Status);
+
+        Assert.Equal(0, escrita.Salvamentos);
     }
 }

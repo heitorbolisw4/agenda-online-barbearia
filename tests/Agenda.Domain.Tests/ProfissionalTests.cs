@@ -7,7 +7,7 @@ public class ProfissionalTests
     [Fact]
     public void Criar_NomeValido_NasceAtivoComId()
     {
-        var profissional = Profissional.Criar("  Barbeiro 1 ");
+        var profissional = Profissional.Criar("  Barbeiro 1 ", "barbeiro1", "senha-falsa");
 
         Assert.Equal("Barbeiro 1", profissional.Nome);
         Assert.True(profissional.Ativo);
@@ -20,6 +20,6 @@ public class ProfissionalTests
     [InlineData(null)]
     public void Criar_SemNome_LancaExcecao(string? nome)
     {
-        Assert.Throws<DomainException>(() => Profissional.Criar(nome!));
+        Assert.Throws<DomainException>(() => Profissional.Criar(nome!, "barbeiro1", "senha-falsa"));
     }
 }

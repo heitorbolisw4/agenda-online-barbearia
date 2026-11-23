@@ -1,9 +1,14 @@
+using System.Text;
 using Agenda.Application;
 using Agenda.Application.Interface;
 using Agenda.Infrastructure.Persistence;
+using Agenda.Infrastructure.Security;
 using Agenda.Web.Endpoints;
 using Agenda.Web.Exceptions;
+using Agenda.Web.Security;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +18,7 @@ builder.Services.AddOpenApi();
 
 var conn = builder.Configuration.GetConnectionString("Agenda");
 builder.Services.AddDbContext<AgendaDbContext>( options => options.UseNpgsql( conn ) );
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 builder.Services.AddScoped<IDisponibilidadeLeitura, DisponibilidadeLeitura>();
 builder.Services.AddScoped<ConsultarHorariosLivres>();
 builder.Services.AddScoped<IAgendamentoEscrita, AgendamentoEscrita>();
@@ -20,6 +26,17 @@ builder.Services.AddScoped<CriarAgendamento>();
 builder.Services.AddScoped<ICatalogoLeitura, CatalogoLeitura>();
 builder.Services.AddScoped<ListarAgendaDoDia>();
 builder.Services.AddScoped<CancelarAgendamento>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+var jwt = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>()!;
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+.AddJwtBearer(o => o.TokenValidationParameters = new TokenValidationParameters
+{
+    ValidIssuer = jwt.Issuer,
+    ValidAudience = jwt.Audience, 
+    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.Key))
+});
+builder.Services.AddAuthorization();
 
 // CORS: deixa o front React (outra porta) chamar a API pelo navegador.
 // Origens em "Cors:Origens"; sem config, libera o Vite padrão (localhost:5173).
@@ -28,6 +45,8 @@ builder.Services.AddCors(o => o.AddDefaultPolicy(p => p.WithOrigins(origens).All
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
+
+
 
 
 
@@ -40,7 +59,9 @@ if (app.Environment.IsDevelopment())
 
     // Banco vazio na máquina local? Cria barbeiros, serviços e expedientes de exemplo.
     using var scope = app.Services.CreateScope();
-    await SeedDesenvolvimento.Executar(scope.ServiceProvider.GetRequiredService<AgendaDbContext>());
+    var senhaDev = app.Configuration["Seed:SenhaDev"] ?? throw new InvalidOperationException("Configure Seed:SenhaDev no user-secrets");
+
+    await SeedDesenvolvimento.Executar(scope.ServiceProvider.GetRequiredService<AgendaDbContext>(), senhaDev);
 }
 
 app.UseHttpsRedirection();
@@ -65,6 +86,11 @@ app.MapGet("/weatherforecast", () =>
     return forecast;
 })
 .WithName("GetWeatherForecast");
+app.UseAuthentication();
+app.UseAuthorization();
+
+
+app.MapAutenticacao();
 app.MapDisponibilidade();
 app.MapAgendamentos();
 app.MapCatalogo();
