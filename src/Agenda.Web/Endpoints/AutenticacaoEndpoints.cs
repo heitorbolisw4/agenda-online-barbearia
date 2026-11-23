@@ -1,5 +1,6 @@
 using Agenda.Application.Interface;
 using Agenda.Infrastructure.Persistence;
+using Agenda.Web.Security;
 using Microsoft.EntityFrameworkCore;
 using static Agenda.Web.DTO.AuthContracts;
 
@@ -14,7 +15,7 @@ public static class AutenticacaoEndpoints
         return app;
     }
 
-    public static async Task<IResult> Login(AgendaDbContext db, IAuthService service, ProfissionalLoginRequest request)
+    public static async Task<IResult> Login(AgendaDbContext db, IAuthService service, ProfissionalLoginRequest request, ITokenService tokenService)
     {
         if(string.IsNullOrWhiteSpace(request.Login) || string.IsNullOrWhiteSpace(request.Senha))
         {
@@ -25,7 +26,7 @@ public static class AutenticacaoEndpoints
         {
             return Results.Unauthorized();
         }
-
-        return Results.Ok();
+        var token = tokenService.GenerateToken(user);
+        return Results.Ok( new {token});
     }
 }

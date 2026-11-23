@@ -4,6 +4,7 @@ using Agenda.Infrastructure.Persistence;
 using Agenda.Infrastructure.Security;
 using Agenda.Web.Endpoints;
 using Agenda.Web.Exceptions;
+using Agenda.Web.Security;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +15,7 @@ builder.Services.AddOpenApi();
 
 var conn = builder.Configuration.GetConnectionString("Agenda");
 builder.Services.AddDbContext<AgendaDbContext>( options => options.UseNpgsql( conn ) );
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
 builder.Services.AddScoped<IDisponibilidadeLeitura, DisponibilidadeLeitura>();
 builder.Services.AddScoped<ConsultarHorariosLivres>();
 builder.Services.AddScoped<IAgendamentoEscrita, AgendamentoEscrita>();
@@ -22,6 +24,7 @@ builder.Services.AddScoped<ICatalogoLeitura, CatalogoLeitura>();
 builder.Services.AddScoped<ListarAgendaDoDia>();
 builder.Services.AddScoped<CancelarAgendamento>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 // CORS: deixa o front React (outra porta) chamar a API pelo navegador.
 // Origens em "Cors:Origens"; sem config, libera o Vite padrão (localhost:5173).
@@ -30,6 +33,8 @@ builder.Services.AddCors(o => o.AddDefaultPolicy(p => p.WithOrigins(origens).All
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
+
+
 
 
 
