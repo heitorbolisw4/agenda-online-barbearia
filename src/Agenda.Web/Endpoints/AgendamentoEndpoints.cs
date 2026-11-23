@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Agenda.Application;
 using Agenda.Domain;
 
@@ -19,8 +20,8 @@ public static class AgendamentoEndpoints
     public static IEndpointRouteBuilder MapAgendamentos(this IEndpointRouteBuilder app)
     {
         app.MapPost("/agendamentos", Criar);
-        app.MapPost("/agendamentos/{id:guid}/cancelar", Cancelar);
-        app.MapGet("/profissionais/{profissionalId:guid}/agenda", AgendaDoDia);
+        app.MapPost("/agendamentos/{id:guid}/cancelar", Cancelar).RequireAuthorization();
+        app.MapGet("/minha-agenda", AgendaDoDia).RequireAuthorization();
         return app;
     }
 
@@ -42,8 +43,13 @@ public static class AgendamentoEndpoints
         return Results.Ok(AgendamentoResponse.De(a));
     }
 
-    public static async Task<IResult> AgendaDoDia(Guid profissionalId, DateOnly data, ListarAgendaDoDia listar, bool incluirCancelados = false)
+    public static async Task<IResult> AgendaDoDia(ClaimsPrincipal usuario, DateOnly data, ListarAgendaDoDia listar, bool incluirCancelados = false)
     {
+        if(!Guid.TryParse(usuario.FindFirstValue(ClaimTypes.NameIdentifier), out var profissionalId))
+        {
+            return Results.Unauthorized();
+        }
+        
         var agenda = await listar.Executar(profissionalId, data, incluirCancelados);
         return Results.Ok(agenda.Select(a => new ItemAgendaResponse(
             a.Id, a.ServicoNome, a.Inicio, a.Fim, a.ClienteNome, a.ClienteTelefone, a.Status.ToString(), a.Origem.ToString())));

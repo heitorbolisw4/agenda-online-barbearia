@@ -1,3 +1,4 @@
+using System.Text;
 using Agenda.Application;
 using Agenda.Application.Interface;
 using Agenda.Infrastructure.Persistence;
@@ -5,7 +6,9 @@ using Agenda.Infrastructure.Security;
 using Agenda.Web.Endpoints;
 using Agenda.Web.Exceptions;
 using Agenda.Web.Security;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +28,15 @@ builder.Services.AddScoped<ListarAgendaDoDia>();
 builder.Services.AddScoped<CancelarAgendamento>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+var jwt = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>()!;
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+.AddJwtBearer(o => o.TokenValidationParameters = new TokenValidationParameters
+{
+    ValidIssuer = jwt.Issuer,
+    ValidAudience = jwt.Audience, 
+    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.Key))
+});
+builder.Services.AddAuthorization();
 
 // CORS: deixa o front React (outra porta) chamar a API pelo navegador.
 // Origens em "Cors:Origens"; sem config, libera o Vite padrão (localhost:5173).
@@ -74,6 +86,10 @@ app.MapGet("/weatherforecast", () =>
     return forecast;
 })
 .WithName("GetWeatherForecast");
+app.UseAuthentication();
+app.UseAuthorization();
+
+
 app.MapAutenticacao();
 app.MapDisponibilidade();
 app.MapAgendamentos();
