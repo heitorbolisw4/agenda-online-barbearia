@@ -37,9 +37,13 @@ public static class AgendamentoEndpoints
         return Results.Created($"/agendamentos/{a.Id}", AgendamentoResponse.De(a));
     }
 
-    public static async Task<IResult> Cancelar(Guid id, CancelarAgendamento cancelar)
+    public static async Task<IResult> Cancelar(Guid id, CancelarAgendamento cancelar, ClaimsPrincipal usuario)
     {
-        var a = await cancelar.Executar(id);
+        if(!Guid.TryParse(usuario.FindFirstValue(ClaimTypes.NameIdentifier), out var profissionalId))
+        {
+            return Results.Unauthorized();
+        }
+        var a = await cancelar.Executar(id, profissionalId);
         return Results.Ok(AgendamentoResponse.De(a));
     }
 
