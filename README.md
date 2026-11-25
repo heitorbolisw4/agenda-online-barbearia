@@ -201,9 +201,11 @@ Os nomes exatos (chave da connection string, projeto das migrations) são confir
 
 ## Como rodar o Front-end
 
-O front usa React + Vite. A área pública fica em `web/src/publica/` e o painel do barbeiro em `web/src/barbeiro/`.
+O front usa React + Vite. A área pública fica em `web/src/publica/`, o painel do barbeiro em `web/src/barbeiro/` e a gestão do proprietário em `web/src/proprietario/`.
 
-Endereços: o cliente usa `http://localhost:5173/`. O barbeiro usa `http://localhost:5173/#/painel` e entra com login e senha. Não há link de um para o outro.
+Endereços: o cliente usa `http://localhost:5173/`. O barbeiro usa `http://localhost:5173/#/painel` e entra com login e senha. O proprietário usa `http://localhost:5173/#/gestao`. Não há link de um para o outro.
+
+Enquanto as rotas `/gestao` não existem no back, ponha `VITE_GESTAO_FALSA=true` no `web/.env.local`: a gestão abre com dados de exemplo, sem login.
 
 ### 1. Instale as ferramentas
 

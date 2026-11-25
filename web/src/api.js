@@ -26,6 +26,11 @@ export const sessao = {
     const token = this.token()
     return token ? lerPayload(token).unique_name : null
   },
+  // "Barbeiro" ou "Proprietario". Só decide o que a tela mostra; quem barra de verdade é a API (403).
+  papel() {
+    const token = this.token()
+    return token ? lerPayload(token).role ?? null : null
+  },
   entrar(token) { localStorage.setItem(CHAVE_TOKEN, token); window.dispatchEvent(new Event('sessao')) },
   sair() { localStorage.removeItem(CHAVE_TOKEN); window.dispatchEvent(new Event('sessao')) },
 }
@@ -61,6 +66,17 @@ export const api = {
   entrar: (login, senha) => chamar('/login', { method: 'POST', body: JSON.stringify({ login, senha }) }),
   minhaAgenda: (data) => chamar(`/minha-agenda?data=${data}&incluirCancelados=true`),
   cancelar: (id) => chamar(`/agendamentos/${id}/cancelar`, { method: 'POST' }),
+}
+
+// Gestão do proprietário (contrato combinado com o back: rotas em /gestao).
+export const apiGestao = {
+  servicos: () => chamar('/gestao/servicos'),
+  criarServico: (dados) => chamar('/gestao/servicos', { method: 'POST', body: JSON.stringify(dados) }),
+  editarServico: (id, dados) => chamar(`/gestao/servicos/${id}`, { method: 'PUT', body: JSON.stringify(dados) }),
+  ativarServico: (id, ativo) => chamar(`/gestao/servicos/${id}/${ativo ? 'ativar' : 'desativar'}`, { method: 'POST' }),
+  profissionais: () => chamar('/gestao/profissionais'),
+  criarProfissional: (dados) => chamar('/gestao/profissionais', { method: 'POST', body: JSON.stringify(dados) }),
+  ativarProfissional: (id, ativo) => chamar(`/gestao/profissionais/${id}/${ativo ? 'ativar' : 'desativar'}`, { method: 'POST' }),
 }
 
 // Datas sempre no fuso da barbearia, não no fuso do navegador.
