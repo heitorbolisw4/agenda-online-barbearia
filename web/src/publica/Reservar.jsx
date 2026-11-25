@@ -17,6 +17,18 @@ const PERIODOS = [
   { nome: 'Noite', de: 18, ate: 24 },
 ]
 
+// Quebra "2026-11-19" em 3 pedaços para o cartão do dia: QUI / 19 / nov.
+// Hoje e amanhã ganham nome próprio, para o cliente não fazer conta.
+function partesDoDia(data, hoje) {
+  const d = new Date(data + 'T12:00:00Z')
+  const formatar = (opcoes) => new Intl.DateTimeFormat('pt-BR', { timeZone: 'UTC', ...opcoes })
+    .format(d).replace('.', '')
+  let semana = formatar({ weekday: 'short' }).toUpperCase()
+  if (data === hoje) semana = 'HOJE'
+  else if (data === somarDias(hoje, 1)) semana = 'AMANHÃ'
+  return { semana, numero: formatar({ day: '2-digit' }), mes: formatar({ month: 'short' }) }
+}
+
 export default function Reservar() {
   const [etapa, setEtapa] = useState('servico')
   const [servicos, setServicos] = useState([])
@@ -144,12 +156,18 @@ export default function Reservar() {
         )}
 
         {etapa === 'dia' && (
-          <div className="grade">
-            {dias.map((d) => (
-              <button key={d} className="botao-dia" onClick={() => { setData(d); avancar() }}>
-                {dataPorExtenso(d)}
-              </button>
-            ))}
+          <div className="grade-dias">
+            {dias.map((d) => {
+              const { semana, numero, mes } = partesDoDia(d, hoje)
+              return (
+                <button key={d} className={data === d ? 'escolhido' : ''} aria-label={dataPorExtenso(d)}
+                  onClick={() => { setData(d); avancar() }}>
+                  <span className="semana">{semana}</span>
+                  <span className="numero">{numero}</span>
+                  <span className="mes">{mes}</span>
+                </button>
+              )
+            })}
           </div>
         )}
 
