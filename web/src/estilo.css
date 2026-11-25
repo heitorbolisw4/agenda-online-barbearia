@@ -82,3 +82,11 @@ input:focus, select:focus, button:focus-visible { outline: 2px solid var(--desta
 .grade-dias button.escolhido { background: var(--destaque); color: var(--fundo); border-color: var(--destaque); box-shadow: none; }
 .grade-dias button.escolhido .semana, .grade-dias button.escolhido .mes { color: var(--fundo); }
 @media (max-width: 360px) { .grade-dias { grid-template-columns: repeat(3, 1fr); } }
+
+/* Gestão do proprietário: listas de serviços e barbeiros */
+.itens { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.itens li { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px; padding: 8px; border: 1px solid var(--linha); border-radius: 6px; }
+.itens li.inativo { opacity: .55; }
+.itens .quem { display: flex; flex-direction: column; }
+.itens .acoes { display: flex; gap: 6px; }
+.aviso { border: 1px solid var(--destaque); background: var(--destaque-suave); padding: 10px 12px; border-radius: 6px; margin: 0; }
