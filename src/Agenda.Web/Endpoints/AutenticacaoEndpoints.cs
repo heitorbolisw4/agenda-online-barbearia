@@ -22,7 +22,7 @@ public static class AutenticacaoEndpoints
             return Results.BadRequest("Deve informar todos os dados para o Login");
         }
         var user = await db.Profissionais.FirstOrDefaultAsync(x => x.Login == request.Login);
-        if( user is null || !service.Conferir( request.Senha,  user.SenhaHash ) )
+        if( user is null || !service.Conferir( request.Senha,  user.SenhaHash ) || user.Ativo == false )
         {
             return Results.Unauthorized();
         }

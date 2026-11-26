@@ -1,3 +1,4 @@
+using Agenda.Domain.Enum;
 using Agenda.Domain.Exceptions;
 
 namespace Agenda.Domain.Tests;
@@ -21,5 +22,19 @@ public class ProfissionalTests
     public void Criar_SemNome_LancaExcecao(string? nome)
     {
         Assert.Throws<DomainException>(() => Profissional.Criar(nome!, "barbeiro1", "senha-falsa"));
+    }
+    [Fact]
+    public void Criar_SemPassarPapel_NasceComoBarbeiro()
+    {
+        var profissional = Profissional.Criar("  Barbeiro 1 ", "barbeiro1", "senha-falsa");
+        Assert.Equal(PapelUser.Barbeiro, profissional.Papel);
+    
+    }
+
+    [Fact]
+    public void Criar_PassandoPapel_NasceComoProprietario()
+    {
+        var profissional = Profissional.Criar("  Barbeiro 1 ", "barbeiro1", "senha-falsa", PapelUser.Proprietario);
+        Assert.Equal(PapelUser.Proprietario, profissional.Papel);
     }
 }

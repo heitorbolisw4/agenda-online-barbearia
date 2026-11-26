@@ -34,6 +34,14 @@ public static class SeedDesenvolvimento
                 db.Expedientes.Add(PeriodoExpediente.Criar(profissional.Id, dia, new TimeOnly(9, 0), new TimeOnly(20, 0)));
             }
         }
+        var hash2 = BCrypt.Net.BCrypt.HashPassword(senhaDev);
+        var proprietario = Profissional.Criar("Luciano", "luciano", hash2, Domain.Enum.PapelUser.Proprietario);
+        for (var dia = DayOfWeek.Monday; dia <= DayOfWeek.Saturday; dia++)
+            {
+                db.Expedientes.Add(PeriodoExpediente.Criar(proprietario.Id, dia, new TimeOnly(9, 0), new TimeOnly(20, 0)));
+            }
+        db.Profissionais.Add(proprietario);
+        
 
         await db.SaveChangesAsync();
     }
