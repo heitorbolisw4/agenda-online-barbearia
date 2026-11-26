@@ -15,5 +15,7 @@ public class ProfissionalConfiguration : IEntityTypeConfiguration<Profissional>
         builder.HasIndex(p => p.Login).IsUnique();
 
         builder.Property(p => p.SenhaHash).HasMaxLength(100).IsRequired();
+        builder.Property(p => p.Papel).HasConversion<string>().HasMaxLength(20);
+    
     }
 }

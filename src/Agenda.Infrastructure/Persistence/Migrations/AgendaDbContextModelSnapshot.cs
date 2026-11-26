@@ -124,6 +124,11 @@ namespace Agenda.Infrastructure.Persistence.Migrations
                         .HasMaxLength(60)
                         .HasColumnType("character varying(60)");
 
+                    b.Property<string>("Papel")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
                     b.Property<string>("SenhaHash")
                         .IsRequired()
                         .HasMaxLength(100)

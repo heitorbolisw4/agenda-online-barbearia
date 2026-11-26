@@ -27,6 +27,7 @@ public class TokenService(IConfiguration config, IOptions<JwtSettings> jwtOption
         {
             new(ClaimTypes.NameIdentifier, profissional.Id.ToString()),
             new(ClaimTypes.Name, profissional.Nome),
+            new(ClaimTypes.Role, profissional.Papel.ToString())
         };
 
         var token = new JwtSecurityToken(
