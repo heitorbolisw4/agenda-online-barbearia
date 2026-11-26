@@ -18,7 +18,10 @@ export default function Gestao() {
         {sessao.nome() && (
           <div className="quem-logou">
             <span>Olá, <b>{sessao.nome()}</b></span>
-            <button className="link" onClick={() => sessao.sair()}>Sair</button>
+            <span className="opcoes">
+              <a href="#/painel">Minha agenda</a>
+              <button className="link" onClick={() => sessao.sair()}>Sair</button>
+            </span>
           </div>
         )}
         <div className="opcoes" role="tablist">

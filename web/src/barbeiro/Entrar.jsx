@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { api, sessao } from '../api.js'
 
-// Login do barbeiro. Deu certo: guarda o token e o App troca para a agenda.
-export default function Entrar() {
+// Login de barbeiro e proprietário (mesma rota /login). Deu certo: guarda o token e o App troca de tela.
+export default function Entrar({ titulo = 'Área do barbeiro' }) {
   const [login, setLogin] = useState('')
   const [senha, setSenha] = useState('')
   const [enviando, setEnviando] = useState(false)
@@ -25,7 +25,7 @@ export default function Entrar() {
 
   return (
     <section className="cartao entrar">
-      <h2>Área do barbeiro</h2>
+      <h2>{titulo}</h2>
       <form onSubmit={entrar} className="formulario">
         <label>
           Login
