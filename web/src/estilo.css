@@ -71,6 +71,7 @@ input:focus, select:focus, button:focus-visible { outline: 2px solid var(--desta
 .entrar { max-width: 360px; margin: 24px auto 0; width: 100%; }
 .quem-logou { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
 .quem-logou .link { align-self: center; }
+.quem-logou .opcoes { align-items: center; gap: 12px; }
 
 /* Etapa do dia: cartões do mesmo tamanho, número em destaque */
 .grade-dias { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }

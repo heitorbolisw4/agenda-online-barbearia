@@ -40,7 +40,11 @@ export default function AgendaDoDia() {
       <section className="cartao">
         <div className="quem-logou">
           <span>Olá, <b>{sessao.nome()}</b></span>
-          <button className="link" onClick={() => sessao.sair()}>Sair</button>
+          <span className="opcoes">
+            {/* Atalho só para o dono. A API barra o resto com 403 de qualquer jeito. */}
+            {sessao.papel() === 'Proprietario' && <a href="#/gestao">Gestão</a>}
+            <button className="link" onClick={() => sessao.sair()}>Sair</button>
+          </span>
         </div>
         <div className="dia">
           <button onClick={() => setData(somarDias(data, -1))}>◀</button>

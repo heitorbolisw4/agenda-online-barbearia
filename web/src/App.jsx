@@ -16,6 +16,20 @@ function rotaAtual() {
   return 'publica'
 }
 
+// Barbeiro logado abriu /#/gestao: explica e oferece o caminho de volta.
+function SoProprietario() {
+  return (
+    <section className="cartao entrar">
+      <h2>Área do proprietário</h2>
+      <p className="mudo">Você entrou como barbeiro. Esta área é só do proprietário.</p>
+      <div className="opcoes">
+        <a href="#/painel">Ir para minha agenda</a>
+        <button className="link" onClick={() => sessao.sair()}>Entrar com outra conta</button>
+      </div>
+    </section>
+  )
+}
+
 export default function App() {
   const [rota, setRota] = useState(rotaAtual())
   const [logado, setLogado] = useState(Boolean(sessao.token()))
@@ -38,8 +52,8 @@ export default function App() {
   // Gestão: precisa de login com papel Proprietario. Com dados de exemplo, abre direto.
   let gestao = <Gestao />
   if (!DADOS_FALSOS) {
-    if (!logado) gestao = <Entrar />
-    else if (sessao.papel() !== 'Proprietario') gestao = <p className="erro">Esta área é só do proprietário.</p>
+    if (!logado) gestao = <Entrar titulo="Área do proprietário" />
+    else if (sessao.papel() !== 'Proprietario') gestao = <SoProprietario />
   }
 
   const telas = { painel, gestao, publica: <Reservar /> }
